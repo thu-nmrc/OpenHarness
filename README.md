@@ -50,13 +50,35 @@ This framework strictly corresponds to the six load-bearing components of Harnes
 | Constrained sandbox & entropy control | `harness_cleanup.py` + Boundary constraints | Periodically archives old records and cleans up temporary files |
 
 ---
+## 📦 Installation
 
-## 🚀 Getting Started
+To install OpenHarness into your OpenClaw environment, simply clone this repository into the `skills` directory of your OpenClaw workspace. 
 
-**You only need to say one sentence.** The framework will automatically complete the rest.
+```bash
+# Create the skills directory if it doesn't exist
+mkdir -p ~/.openclaw/workspace/skills
 
-Example command:
-> "Monitor AI frontier trends every day, write a 10,000-word in-depth article for each trend, target 50 articles."
+# Clone the OpenHarness repository as a skill
+git clone https://github.com/your-org/OpenHarness.git ~/.openclaw/workspace/skills/harness-24h
+```
+
+Once installed, OpenClaw will automatically recognize the `SKILL.md` file within the repository and equip the agent with the Harness capabilities. All running tasks managed by OpenHarness will automatically be stored in `~/.openclaw/workspace/harness/`.
+
+---
+## 🚀 Getting Started: One-Sentence Trigger
+
+**You only need to say one sentence.** The framework will automatically complete the rest. There is no need to manually create folders or edit configuration files.
+
+### How to Write a Prompt
+To successfully trigger OpenHarness, your prompt should clearly state:
+1. **The intent to use the framework**: Mention "use the harness project" or "use the harness framework".
+2. **The core task**: What exactly the AI needs to do.
+3. **The target/quantity**: The final expected output or completion condition.
+
+### Example Prompt
+
+> *"Next, use this harness project to do 50 research reports related to the AI field separately, and finally summarize and organize them to give me a comprehensive AI field development report."*
+
 
 The agent will automatically complete the following entire process for you, without the need to manually edit any files:
 
