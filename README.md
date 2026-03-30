@@ -9,7 +9,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/build-passing-success" alt="Build Status"/>
   <img src="https://img.shields.io/badge/release-v1.0.0-blue" alt="Release"/>
-  <img src="https://img.shields.io/badge/license-MIT-green" alt="License"/>
+  <img src="https://img.shields.io/badge/license-BSL 1.1-green" alt="License"/>
 </p>
 
 **OpenHarness** is a long-term, fully autonomous AI agent execution framework built on the concept of **Harness Engineering**. It enables your AI to work tirelessly for you 24/7 with just a single command.
