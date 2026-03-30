@@ -28,7 +28,7 @@ OpenHarness takes a completely different approach: **Absolute Reliability over E
 |---|---|---|---|
 | **Cross-Session Memory** | ❌ Loses context | ❌ Vector DB mess | ✅ `heartbeat.md` precise breakpoint recovery |
 | **Completion Validation**| ❌ AI self-certifies | ❌ AI self-certifies | ✅ External `harness_eval.py` strict audit |
-| **Execution Sandbox** | ❌ Unbounded | ❌ Unbounded | ✅ Strict `mission.md` contract constraints |
+| **Execution Sandbox** | ❌ Unbounded | ❌ Unbounded | ✅ Strict `progress.md``mission.md` contract constraints |
 | **Entropy Control** | ❌ Context bloat | ❌ Context bloat | ✅ Built-in `harness_cleanup.py` garbage collection |
 | **Trigger Mechanism** | Manual start | Manual start | ✅ 24/7 Cron scheduled, fully unattended |
 
