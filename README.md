@@ -35,21 +35,6 @@ If `skills` defines "what the agent can do", then `harness` defines "how the age
 - **Machine-Verifiable Contract**: Translates user requirements into a clear `mission.md` to constrain the AI's behavioral boundaries.
 
 ---
-
-## ⚙️ Mapping of the Six Components of Harness Engineering
-
-This framework strictly corresponds to the six load-bearing components of Harness Engineering:
-
-| Harness Engineering Component | Framework Component | Operation Method |
-|---|---|---|
-| Machine-verifiable completion contract | `mission.md` + `eval_criteria.md` | Defines machine-checkable conditions for "what is considered done" |
-| Maintainable knowledge as system of record | `playbook.md` + `progress.md` | Writes execution steps into versioned documents to record historical trajectories |
-| Giving the Agent senses and limbs | Tool definitions in `playbook.md` | Lists specific tools needed for each step (e.g., browser, file) |
-| Solving long-term amnesia | `heartbeat.md` + `progress.md` | Cross-session state recovery, automatically maintained by the framework |
-| External validation loop | `harness_eval.py` + `eval_criteria.md` | Validation script independent of execution, rejecting "subjectively feels good" |
-| Constrained sandbox & entropy control | `harness_cleanup.py` + Boundary constraints | Periodically archives old records and cleans up temporary files |
-
----
 ## 📦 Installation
 
 To install OpenHarness into your OpenClaw environment, simply clone this repository into the `skills` directory of your OpenClaw workspace. 
@@ -108,6 +93,22 @@ Every time the scheduled task is triggered, the agent will execute according to 
 │  8. If all completed → mission_complete │
 └─────────────────────────────────────────┘
 ```
+
+## ⚙️ Mapping of the Six Components of Harness Engineering
+
+This framework strictly corresponds to the six load-bearing components of Harness Engineering:
+
+| Harness Engineering Component | Framework Component | Operation Method |
+|---|---|---|
+| Machine-verifiable completion contract | `mission.md` + `eval_criteria.md` | Defines machine-checkable conditions for "what is considered done" |
+| Maintainable knowledge as system of record | `playbook.md` + `progress.md` | Writes execution steps into versioned documents to record historical trajectories |
+| Giving the Agent senses and limbs | Tool definitions in `playbook.md` | Lists specific tools needed for each step (e.g., browser, file) |
+| Solving long-term amnesia | `heartbeat.md` + `progress.md` | Cross-session state recovery, automatically maintained by the framework |
+| External validation loop | `harness_eval.py` + `eval_criteria.md` | Validation script independent of execution, rejecting "subjectively feels good" |
+| Constrained sandbox & entropy control | `harness_cleanup.py` + Boundary constraints | Periodically archives old records and cleans up temporary files |
+
+---
+
 
 ---
 
