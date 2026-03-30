@@ -35,21 +35,23 @@ If `skills` defines "what the agent can do", then `harness` defines "how the age
 - **Machine-Verifiable Contract**: Translates user requirements into a clear `mission.md` to constrain the AI's behavioral boundaries.
 
 ---
+
 ## 📦 Installation
 
-To install OpenHarness into your OpenClaw environment, simply clone this repository into the `skills` directory of your OpenClaw workspace. 
+To install OpenHarness into your OpenClaw environment, create the `harness` directory inside your OpenClaw workspace and clone this repository directly into it.
 
 ```bash
-# Create the skills directory if it doesn't exist
-mkdir -p ~/.openclaw/workspace/skills
+# Create the harness directory
+mkdir -p ~/.openclaw/workspace/harness
 
-# Clone the OpenHarness repository as a skill
-git clone https://github.com/your-org/OpenHarness.git ~/.openclaw/workspace/skills/harness-24h
+# Clone OpenHarness into it
+git clone https://github.com/thu-nmrc/OpenHarness.git ~/.openclaw/workspace/harness
 ```
 
-Once installed, OpenClaw will automatically recognize the `SKILL.md` file within the repository and equip the agent with the Harness capabilities. All running tasks managed by OpenHarness will automatically be stored in `~/.openclaw/workspace/harness/`.
+Once installed, OpenClaw will automatically recognize the `SKILL.md` file and equip the agent with Harness capabilities. The `harness` directory sits at the same level as `skills` and `memory` — it is a core workspace component, not a plugin.
 
 ---
+
 ## 🚀 Getting Started: One-Sentence Trigger
 
 **You only need to say one sentence.** The framework will automatically complete the rest. There is no need to manually create folders or edit configuration files.
@@ -63,7 +65,6 @@ To successfully trigger OpenHarness, your prompt should clearly state:
 ### Example Prompt
 
 > *"Next, use this harness project to do 50 research reports related to the AI field separately, and finally summarize and organize them to give me a comprehensive AI field development report."*
-
 
 The agent will automatically complete the following entire process for you, without the need to manually edit any files:
 
