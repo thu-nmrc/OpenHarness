@@ -18,7 +18,23 @@ Whether it is daily monitoring of frontier trends, scheduling competitive price 
 
 
 ---
+## 🤔 Why OpenHarness?
 
+Most autonomous AI frameworks (like AutoGPT or BabyAGI) rely on the agent's "subjective judgment" to decide what to do next. The result? Infinite loops, context window explosions, and premature task completion.
+
+OpenHarness takes a completely different approach: **Absolute Reliability over Emergent Intelligence.**
+
+| Feature | AutoGPT | BabyAGI | OpenHarness ⚙️ |
+|---|---|---|---|
+| **Cross-Session Memory** | ❌ Loses context | ❌ Vector DB mess | ✅ `heartbeat.md` precise breakpoint recovery |
+| **Completion Validation**| ❌ AI self-certifies | ❌ AI self-certifies | ✅ External `harness_eval.py` strict audit |
+| **Execution Sandbox** | ❌ Unbounded | ❌ Unbounded | ✅ Strict `mission.md` contract constraints |
+| **Entropy Control** | ❌ Context bloat | ❌ Context bloat | ✅ Built-in `harness_cleanup.py` garbage collection |
+| **Trigger Mechanism** | Manual start | Manual start | ✅ 24/7 Cron scheduled, fully unattended |
+
+**Core Difference: Mechanical Constraints + External Audit + 100% Traceability.**
+
+---
 ## 📍 Positioning
 
 
