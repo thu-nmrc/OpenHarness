@@ -10,10 +10,10 @@
 | Parameter | Value | Description |
 |------|-----|------|
 | Schedule Type | `cron` | `cron` (precise time) or `interval` (fixed interval) |
-| cron Expression | `0 0 */2 * * *` | 6-field format: second minute hour day month week. Example = every 2 hours |
+| Cron Expression | `0 0 */2 * * *` | 6-field format: second minute hour day month week. Example = every 2 hours |
 | Or: Interval Seconds | `7200` | Fill only when schedule type is interval |
 | Repeat | `true` | `true` = continuous execution, `false` = execute only once |
-| Expiration Time | `[empty or 2026-04-01 00:00:00]` | Leave empty = never expires |
+| Expire | `[empty or 2026-04-01 00:00:00]` | Leave empty = never expires |
 | Timezone | `Asia/Shanghai` | User's timezone |
 
 ## Task Prompt Template
@@ -23,15 +23,15 @@
 ```
 Read the following files and execute tasks according to the driving framework:
 
-1. Read /home/ubuntu/workspace/mission.md — Understand the task objectives
-2. Read /home/ubuntu/workspace/heartbeat.md — Restore last state
-3. Read /home/ubuntu/workspace/progress.md — Understand historical progress
-4. Read /home/ubuntu/workspace/playbook.md — Obtain execution steps
+1. Read {workspace}/mission.md — Understand the task objectives
+2. Read {workspace}/heartbeat.md — Restore last state
+3. Read {workspace}/progress.md — Understand historical progress
+4. Read {workspace}/playbook.md — Obtain execution steps
 5. Continue execution from the breakpoint recorded in heartbeat
 6. After completion:
-   a. Read /home/ubuntu/workspace/eval_criteria.md for validation
-   b. Update /home/ubuntu/workspace/heartbeat.md (status, progress, exceptions)
-   c. Append records to /home/ubuntu/workspace/progress.md
+   a. Read {workspace}/eval_criteria.md for validation
+   b. Update {workspace}/heartbeat.md (status, progress, exceptions)
+   c. Append records to {workspace}/progress.md
 7. If all completion conditions are met, set heartbeat status to mission_complete
 ```
 

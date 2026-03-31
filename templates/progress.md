@@ -17,19 +17,21 @@
 
 <!-- Append a record after each execution. Fixed format for machine parsing. -->
 
-### Run #001 — [Timestamp]
+<!-- 
+Example format for each run record (this comment is NOT parsed by scripts):
+
+### Run #001 — 2026-01-01 00:00:00
 
 | Field | Value |
 |------|-----|
-| Start Time | `[Auto-filled]` |
-| End Time | `[Auto-filled]` |
-| Execution Steps | `Step X → Step Y` |
-| Execution Result | `Success / Partial Success / Failure` |
-| Output | `[File path or description]` |
-| Verification Result | `[Passed/Failed, with specific items]` |
-| Remarks | `[Special notes]` |
+| Start Time | `2026-01-01 00:00:00` |
+| End Time | `2026-01-01 00:05:00` |
+| Execution Step | `Step 1` |
+| Execution Result | `Success` |
+| Notes | `Completed data collection` |
 
 ---
+-->
 
 <!-- Subsequent execution records appended here -->
 
