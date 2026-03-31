@@ -32,21 +32,21 @@ When a user describes a task idea (e.g. "monitor AI news and write 50 deep-dive 
 
 Choose a workspace path based on the task name. Convention:
 ```
-/home/ubuntu/{task-slug}/
+~/.openclaw/workspace/harness/{task-slug}/
 ```
-For example, for "AI news deep-dive articles" → `/home/ubuntu/ai-deepdive/`
+For example, for "AI news deep-dive articles" → `~/.openclaw/workspace/harness/ai-deepdive/`
 
 ### Step A2: Initialize Workspace
 
 ```bash
-python3 /home/ubuntu/skills/harness-24h/scripts/harness_boot.py /path/to/workspace --init
+python3 ~/.openclaw/workspace/harness/scripts/harness_boot.py /path/to/workspace --init
 ```
 
 This copies all template files into the workspace. Do NOT ask the user to run this.
 
 ### Step A3: Fill ALL Template Files Yourself
 
-Based on the user's task description, Agent must write the following files completely. Do NOT leave any placeholder text (`[Fill in here...]`, `[Example:...]`) in any file.
+Based on the user's task description, Agent must write the following files completely. Do NOT leave any placeholder text (`[Fill in ...]`, `[e.g., ...]`) in any file.
 
 **File 1 — `mission.md`**: Write the task contract. Must include:
 - Task name (one sentence)
@@ -109,7 +109,7 @@ Also initialize any seed data files (e.g., `echo "[]" > /path/to/workspace/outpu
 ### Step A5: Verify Workspace is Ready
 
 ```bash
-python3 /home/ubuntu/skills/harness-24h/scripts/harness_boot.py /path/to/workspace
+python3 ~/.openclaw/workspace/harness/scripts/harness_boot.py /path/to/workspace
 ```
 
 The output must say "✅ Workspace ready, execution can begin."
@@ -119,7 +119,7 @@ If it shows issues, fix them before proceeding.
 
 Run the setup script to get schedule parameters:
 ```bash
-python3 /home/ubuntu/skills/harness-24h/scripts/harness_setup_cron.py /path/to/workspace
+python3 ~/.openclaw/workspace/harness/scripts/harness_setup_cron.py /path/to/workspace
 ```
 
 Then immediately use the `schedule` tool with those parameters. Do NOT ask the user to do this.
@@ -146,7 +146,7 @@ When triggered by a scheduled cron job, ALWAYS follow this strict sequence:
 ### Step B1: Boot and Check Status
 
 ```bash
-python3 /home/ubuntu/skills/harness-24h/scripts/harness_boot.py /path/to/workspace
+python3 ~/.openclaw/workspace/harness/scripts/harness_boot.py /path/to/workspace
 ```
 
 Read the output carefully:
@@ -158,7 +158,7 @@ Read the output carefully:
 ### Step B2: Mark Start
 
 ```bash
-python3 /home/ubuntu/skills/harness-24h/scripts/harness_heartbeat.py /path/to/workspace start
+python3 ~/.openclaw/workspace/harness/scripts/harness_heartbeat.py /path/to/workspace start
 ```
 
 > ⚠️ heartbeat.md is always at `{workspace}/heartbeat.md` — the same directory as mission.md.
@@ -178,20 +178,20 @@ Perform the steps defined in `playbook.md`, starting from the step recorded in `
 
 If this round succeeded:
 ```bash
-python3 /home/ubuntu/skills/harness-24h/scripts/harness_heartbeat.py /path/to/workspace done \
+python3 ~/.openclaw/workspace/harness/scripts/harness_heartbeat.py /path/to/workspace done \
   --step "Step X" --summary "Brief summary of what was accomplished"
 ```
 
 If this round failed:
 ```bash
-python3 /home/ubuntu/skills/harness-24h/scripts/harness_heartbeat.py /path/to/workspace fail \
+python3 ~/.openclaw/workspace/harness/scripts/harness_heartbeat.py /path/to/workspace fail \
   --step "Step X" --error "Error description"
 ```
 
 ### Step B6: External Validation
 
 ```bash
-python3 /home/ubuntu/skills/harness-24h/scripts/harness_eval.py /path/to/workspace
+python3 ~/.openclaw/workspace/harness/scripts/harness_eval.py /path/to/workspace
 ```
 
 If validation fails: decide whether to retry or mark as blocked.
@@ -199,14 +199,14 @@ If validation fails: decide whether to retry or mark as blocked.
 ### Step B7: Entropy Control (Every 10 Runs)
 
 ```bash
-python3 /home/ubuntu/skills/harness-24h/scripts/harness_cleanup.py /path/to/workspace
+python3 ~/.openclaw/workspace/harness/scripts/harness_cleanup.py /path/to/workspace
 ```
 
 ### Step B8: Mission Complete Check
 
 If all completion criteria in `mission.md` are met:
 ```bash
-python3 /home/ubuntu/skills/harness-24h/scripts/harness_heartbeat.py /path/to/workspace mission_complete
+python3 ~/.openclaw/workspace/harness/scripts/harness_heartbeat.py /path/to/workspace mission_complete
 ```
 
 ---
