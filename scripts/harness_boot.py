@@ -89,7 +89,7 @@ def _is_filled(filepath: Path) -> bool:
         return False
     content = filepath.read_text(encoding="utf-8")
     # Check if there are still unfilled placeholders
-    return "[Fill here" not in content and "[Example:" not in content
+    return "[Fill in" not in content and "[e.g.," not in content
 
 
 def validate_workspace(workspace: Path) -> dict:
@@ -144,14 +144,14 @@ def read_heartbeat(workspace: Path) -> dict:
     step_match = re.search(r"\| Current Step \| `(.+?)`", content)
     last_time_match = re.search(r"\| Last Execution Time \| `(.+?)`", content)
     fail_match = re.search(r"\| Consecutive Failures \| `(\d+)`", content)
-    total_match = re.search(r"\| Total Runs \| `(\d+)`", content)
+    total_match = re.search(r"\| Total Executions \| `(\d+)`", content)
 
     return {
         "status": status_match.group(1) if status_match else "unknown",
         "current_step": step_match.group(1) if step_match else "unknown",
         "last_execution": last_time_match.group(1) if last_time_match else "unknown",
         "consecutive_failures": int(fail_match.group(1)) if fail_match else 0,
-        "total_runs": int(total_match.group(1)) if total_match else 0,
+        "total_executions": int(total_match.group(1)) if total_match else 0,
     }
 
 
@@ -161,7 +161,7 @@ def read_mission_name(workspace: Path) -> str:
     if not mission_path.exists():
         return "[Undefined]"
     content = mission_path.read_text(encoding="utf-8")
-    name_match = re.search(r"\*\*Name\*\*:`(.+?)`", content)
+    name_match = re.search(r"\*\*Name\*\*[：:]\s*`(.+?)`", content)
     return name_match.group(1) if name_match else "[Not filled]"
 
 
@@ -181,7 +181,7 @@ def boot_report(workspace: Path):
     print(f"📁 Workspace: {workspace}")
     print(f"💓 Status: {heartbeat.get('status', 'unknown')}")
     print(f"📍 Current Step: {heartbeat.get('current_step', 'unknown')}")
-    print(f"🔄 Total Runs: {heartbeat.get('total_runs', 0)}")
+    print(f"🔄 Total Executions: {heartbeat.get('total_executions', 0)}")
     print(f"❌ Consecutive Failures: {heartbeat.get('consecutive_failures', 0)}")
     print(f"🕐 Last Execution: {heartbeat.get('last_execution', 'unknown')}")
 

@@ -34,7 +34,7 @@ def compress_progress(workspace: Path, max_runs: int, dry_run: bool) -> dict:
     content = prog_path.read_text(encoding="utf-8")
 
     # Find all Run records
-    runs = list(re.finditer(r"### Run #(\d+) — (.+?)(?=\n### Run #|\n## Completion Criteria Tracking|\Z)", content, re.DOTALL))
+    runs = list(re.finditer(r"### Run #(\d+) — (.+?)(?=\n### Run #|\n## Completion Condition Tracking|\Z)", content, re.DOTALL))
 
     if len(runs) <= max_runs:
         result["changes"].append(f"Current {len(runs)} records do not exceed the limit {max_runs}, no compression needed")
@@ -69,8 +69,8 @@ def compress_progress(workspace: Path, max_runs: int, dry_run: bool) -> dict:
     for run in to_keep:
         kept_content += run.group(0) + "\n"
 
-    # Find tail (Completion Criteria Tracking and after)
-    tail_match = re.search(r"## Completion Criteria Tracking", content)
+    # Find tail (Completion Condition Tracking and after)
+    tail_match = re.search(r"## Completion Condition Tracking", content)
     tail = content[tail_match.start():] if tail_match else ""
 
     new_content = header + "<!-- Subsequent execution records appended here -->\n\n" + kept_content + "\n" + tail

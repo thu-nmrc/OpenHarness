@@ -93,7 +93,7 @@ def cmd_done(workspace: Path, args):
     if args.summary:
         # Update current execution summary
         content = re.sub(
-            r"(## Current Execution Summary\n\n<!-- .+? -->\n\n)```\n.+?\n```",
+            r"(## This Round Execution Summary\n\n<!-- .+? -->\n\n)```\n.+?\n```",
             rf"\1```\n{now_str()} | {args.summary}\n```",
             content,
             flags=re.DOTALL,
@@ -126,11 +126,11 @@ def cmd_fail(workspace: Path, args):
     if args.error and args.step:
         error_row = f"| {now_str()} | {args.step} | {args.error} | Auto-recorded |"
         content = content.replace(
-            "| - | - | No exceptions | - |",
+            "| - | - | No exceptions so far | - |",
             error_row,
         )
         # If there are already exception records, append new row
-        if "No exceptions" not in content:
+        if "No exceptions so far" not in content:
             # Append at the end of exception records table
             content = re.sub(
                 r"(## Exception Records\n\n<!-- .+? -->\n\n\|.+?\|.+?\|.+?\|.+?\|\n\|[-| ]+\|\n)((?:\|.+?\|\n)*)",
@@ -165,7 +165,7 @@ def cmd_blocked(workspace: Path, args):
     content = read_file(hb_path)
 
     content = update_field(content, "Current Status", "blocked")
-    content = update_field(content, "Block Reason", args.reason or "Not specified")
+    content = update_field(content, "Blocking Reason", args.reason or "Not specified")
 
     write_file(hb_path, content)
     print(f"[HEARTBEAT] 🚨 Task blocked! Reason: {args.reason} | Time: {now_str()}")

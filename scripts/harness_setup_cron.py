@@ -38,9 +38,11 @@ def parse_cron_config(workspace: Path) -> dict:
     fields = {
         "Schedule Type": "schedule_type",
         "Cron Expression": "cron_expression",
+        "cron Expression": "cron_expression",
         "Or: Interval Seconds": "interval_seconds",
         "Repeat": "repeat",
         "Expire": "expire",
+        "Expiration Time": "expire",
         "Timezone": "timezone",
         # Legacy Chinese field names for backward compatibility
         "调度类型": "schedule_type",
