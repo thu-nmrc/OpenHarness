@@ -124,11 +124,15 @@ def generate_schedule_params(workspace: Path) -> dict:
     params["playbook"] = f"""Agent framework execution best practices:
 1. Run python3 {Path(__file__).parent}/harness_boot.py {workspace} to check status at startup
 2. Call python3 {Path(__file__).parent}/harness_heartbeat.py {workspace} start to mark start
-3. Continue execution from breakpoint according to playbook.md steps
-4. After completion, call python3 {Path(__file__).parent}/harness_heartbeat.py {workspace} done --step "StepX" --summary "Summary"
-5. On failure, call python3 {Path(__file__).parent}/harness_heartbeat.py {workspace} fail --step "StepX" --error "Error description"
-6. Run python3 {Path(__file__).parent}/harness_eval.py {workspace} for validation
-7. Periodically run python3 {Path(__file__).parent}/harness_cleanup.py {workspace} for entropy control"""
+3. Read context in cache-aware order: mission.md → eval_criteria.md → playbook.md → heartbeat.md
+4. Load only relevant knowledge files listed in heartbeat.md Knowledge Index section
+5. During execution, log events: python3 {Path(__file__).parent}/harness_memory.py {workspace} stream --step "StepX" --event "What happened"
+6. When discovering reusable patterns: python3 {Path(__file__).parent}/harness_memory.py {workspace} learn --topic "topic_name" --insight "What was learned"
+7. After completion, call python3 {Path(__file__).parent}/harness_heartbeat.py {workspace} done --step "StepX" --summary "Summary"
+8. On failure, call python3 {Path(__file__).parent}/harness_heartbeat.py {workspace} fail --step "StepX" --error "Error description"
+9. Run python3 {Path(__file__).parent}/harness_eval.py {workspace} for validation
+10. Every 10 runs: python3 {Path(__file__).parent}/harness_cleanup.py {workspace} for entropy control
+NOTE: KAIROS dream mode (harness_dream.py) runs on its own separate cron schedule (daily at 3 AM). Do NOT call it during normal task execution."""
 
     return params
 
