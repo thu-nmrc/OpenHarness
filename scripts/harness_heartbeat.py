@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-harness_heartbeat.py — Agent framework heartbeat update script
+harness_heartbeat.py — Agent framework heartbeat update script (v2: Three-Layer Memory)
 
 Functions:
-1. Update the status field in heartbeat.md
-2. Append execution records to progress.md
-3. Record exception information
+1. Update the compact pointer index in heartbeat.md (Layer 1)
+2. Append structured entries to execution_stream.log (Layer 3)
+3. Maintain backward-compatible progress.md records
+4. Enforce Strict Write Discipline: status updates are gated by eval success
 
 Usage:
     # Mark start of execution
@@ -29,6 +30,9 @@ import re
 import sys
 from datetime import datetime
 from pathlib import Path
+
+
+STREAM_LOG = "logs/execution_stream.log"
 
 
 def update_field(content: str, field_name: str, new_value: str) -> str:
@@ -58,6 +62,15 @@ def now_str() -> str:
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
+def append_stream(workspace: Path, level: str, step: str, message: str):
+    """Append to Layer 3 execution stream log."""
+    log_path = workspace / STREAM_LOG
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    entry = f"[{now_str()}] [{level}] [Step: {step}] {message}\n"
+    with open(log_path, "a", encoding="utf-8") as f:
+        f.write(entry)
+
+
 def cmd_start(workspace: Path, args):
     """Mark start of execution"""
     hb_path = workspace / "heartbeat.md"
@@ -76,6 +89,10 @@ def cmd_start(workspace: Path, args):
         content = update_field(content, "Total Executions", str(new_total))
 
     write_file(hb_path, content)
+
+    # Layer 3: log start event
+    append_stream(workspace, "INFO", "boot", "Execution started")
+
     print(f"[HEARTBEAT] Status → running | Time: {now_str()}")
 
 
@@ -88,20 +105,24 @@ def cmd_done(workspace: Path, args):
     content = update_field(content, "Last Execution Result", "Success")
     content = update_field(content, "Consecutive Failures", "0")
 
+    # Reset circuit breaker on success
+    content = update_field(content, "Circuit Breaker", "off")
+    content = update_field(content, "Compaction Failures", "0")
+    content = update_field(content, "Stuck Detection", "clear")
+
     if args.step:
         content = update_field(content, "Current Step", args.step)
     if args.summary:
-        # Update current execution summary
-        content = re.sub(
-            r"(## This Round Execution Summary\n\n<!-- .+? -->\n\n)```\n.+?\n```",
-            rf"\1```\n{now_str()} | {args.summary}\n```",
-            content,
-            flags=re.DOTALL,
-        )
+        content = update_field(content, "Last Successful Artifact", args.summary[:100])
 
     write_file(hb_path, content)
 
-    # Append to progress.md
+    # Layer 3: log success
+    step_info = args.step or "N/A"
+    summary_info = args.summary or "Completed"
+    append_stream(workspace, "SUCCESS", step_info, summary_info)
+
+    # Backward-compatible: append to progress.md
     if args.summary:
         append_progress(workspace, "Success", args.step or "N/A", args.summary)
 
@@ -118,33 +139,22 @@ def cmd_fail(workspace: Path, args):
 
     # Increment consecutive failure count
     fail_match = re.search(r"\| Consecutive Failures \| `(\d+)`", content)
+    new_fails = 1
     if fail_match:
         new_fails = int(fail_match.group(1)) + 1
         content = update_field(content, "Consecutive Failures", str(new_fails))
 
-    # Record exception
-    if args.error and args.step:
-        error_row = f"| {now_str()} | {args.step} | {args.error} | Auto-recorded |"
-        content = content.replace(
-            "| - | - | No exceptions so far | - |",
-            error_row,
-        )
-        # If there are already exception records, append new row
-        if "No exceptions so far" not in content:
-            # Append at the end of exception records table
-            content = re.sub(
-                r"(## Exception Records\n\n<!-- .+? -->\n\n\|.+?\|.+?\|.+?\|.+?\|\n\|[-| ]+\|\n)((?:\|.+?\|\n)*)",
-                rf"\1\2{error_row}\n",
-                content,
-                flags=re.DOTALL,
-            )
-
     write_file(hb_path, content)
 
-    # Append to progress.md
+    # Layer 3: log failure
+    step_info = args.step or "N/A"
+    error_info = args.error or "Unknown error"
+    append_stream(workspace, "ERROR", step_info, error_info)
+
+    # Backward-compatible: append to progress.md
     append_progress(workspace, "Failed", args.step or "N/A", args.error or "Unknown error")
 
-    print(f"[HEARTBEAT] Status → failed | Error: {args.error} | Time: {now_str()}")
+    print(f"[HEARTBEAT] Status → failed (consecutive: {new_fails}) | Error: {args.error} | Time: {now_str()}")
 
 
 def cmd_mission_complete(workspace: Path, args):
@@ -156,6 +166,10 @@ def cmd_mission_complete(workspace: Path, args):
     content = update_field(content, "Last Execution Result", "Mission Completed")
 
     write_file(hb_path, content)
+
+    # Layer 3: log mission complete
+    append_stream(workspace, "SUCCESS", "final", "Mission completed!")
+
     print(f"[HEARTBEAT] 🎉 Mission completed! Time: {now_str()}")
 
 
@@ -168,14 +182,18 @@ def cmd_blocked(workspace: Path, args):
     content = update_field(content, "Blocking Reason", args.reason or "Not specified")
 
     write_file(hb_path, content)
+
+    # Layer 3: log blocked
+    append_stream(workspace, "WARN", "blocked", args.reason or "Manual intervention required")
+
     print(f"[HEARTBEAT] 🚨 Task blocked! Reason: {args.reason} | Time: {now_str()}")
 
 
 def append_progress(workspace: Path, result: str, step: str, note: str):
-    """Append execution record to progress.md"""
+    """Append execution record to progress.md (backward compatibility)"""
     prog_path = workspace / "progress.md"
     if not prog_path.exists():
-        print(f"[WARN] progress.md does not exist at {prog_path}, skipping progress record. Please confirm Agent has written it to the workspace: {workspace}")
+        print(f"[WARN] progress.md does not exist at {prog_path}, skipping progress record.")
         return
 
     content = read_file(prog_path)
@@ -198,7 +216,7 @@ def append_progress(workspace: Path, result: str, step: str, note: str):
 ---
 """
 
-    # Append after the comment "Subsequent execution records appended here"
+    # Append after the marker
     marker = "<!-- Subsequent execution records appended here -->"
     if marker in content:
         content = content.replace(marker, marker + "\n" + record)
@@ -221,7 +239,7 @@ def append_progress(workspace: Path, result: str, step: str, note: str):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Agent framework heartbeat update")
+    parser = argparse.ArgumentParser(description="Agent framework heartbeat update (v2)")
     parser.add_argument("workspace", help="Workspace directory path")
     subparsers = parser.add_subparsers(dest="command", help="Operation commands")
 
