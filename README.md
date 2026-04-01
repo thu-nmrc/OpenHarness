@@ -8,7 +8,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/build-passing-success" alt="Build Status"/>
-  <img src="https://img.shields.io/badge/release-2026.03.31-blue" alt="Release"/>
+  <img src="https://img.shields.io/badge/release-2026.04.01-blue" alt="Release"/>
   <img src="https://img.shields.io/badge/license-BSL 1.1-green" alt="License"/>
 </p>
 
@@ -136,30 +136,33 @@ Every time the scheduled task is triggered (e.g., every hour), the agent execute
 harness-24h/
 ├── SKILL.md                      ← 🧠 Agent skill entry point (triggered automatically)
 ├── scripts/
-│   ├── harness_boot.py           ← 🥾 Bootstrapper: Initialization + state check
+│   ├── harness_boot.py           ← 🥾 Bootstrapper: Initialization + state check + circuit breaker
 │   ├── harness_heartbeat.py      ← ❤️ Heartbeat: State read/write + progress tracking
+│   ├── harness_memory.py         ← 🧠 Three-layer memory manager (NEW)
+│   ├── harness_dream.py          ← 💤 KAIROS dream mode: offline memory consolidation (NEW)
+│   ├── harness_coordinator.py    ← 🤝 Multi-agent coordinator: file-system IPC (NEW)
 │   ├── harness_eval.py           ← ⚖️ External validation: Independent quality check
-│   ├── harness_cleanup.py        ← 🧹 Entropy control: Log compression + temp file cleanup
+│   ├── harness_cleanup.py        ← 🧹 Entropy control: Log compression + stream rotation
 │   ├── harness_setup_cron.py     ← ⏱️ Scheduling config: Generate cron parameters
-│   ├── harness_linter.py         ← 🏗️ Architecture linter: Constraint enforcement (Pillar 2)
-│   └── memory_evolution.py       ← 🧬 Memory evolution: Trajectory learning engine (Pillar 3)
+│   ├── harness_linter.py         ← 🏗️ Architecture linter: Constraint enforcement
+│   └── memory_evolution.py       ← 🧬 Memory evolution: Trajectory learning engine (legacy)
 ├── references/
 │   ├── architecture.md           ← 🏛️ Architecture explanation (for the Agent to read)
 │   └── anti-patterns.md          ← 🚫 Anti-patterns list (for the Agent to read)
 └── templates/
     ├── mission.md                ← 📜 Task contract template
     ├── playbook.md               ← 🗺️ Execution playbook template
-    ├── heartbeat.md              ← 💓 Heartbeat state template
+    ├── heartbeat.md              ← 💓 Heartbeat state template (redesigned as L1 pointer index)
     ├── progress.md               ← 📊 Progress log template
     ├── eval_criteria.md          ← 🔍 Validation criteria template
-    └── cron_config.md            ← ⏰ Scheduling configuration template
+    ├── cron_config.md            ← ⏰ Scheduling configuration template
+    └── knowledge/                ← 📚 L2 topic knowledge directory (NEW)
+        └── README.md
 ```
 
 ---
 
-## 🗺️ Roadmap: The Three Pillars of Harness Engineering
-
-OpenHarness is rapidly evolving from a script-based scaffold into an industrial-grade orchestration platform. Our immediate roadmap is structured around the **Three Pillars of Harness Engineering**:
+## 🗺️ Roadmap
 
 ### 🛡️ Pillar 1: The Evaluation Loop (High Priority)
 *We are upgrading `harness_eval.py` from basic file checks to a true End-to-End (E2E) Evaluation Engine.*
@@ -171,14 +174,11 @@ OpenHarness is rapidly evolving from a script-based scaffold into an industrial-
 - [ ] **Mechanical Linter (`harness_linter.py`)**: Enforce strict directional dependencies (e.g., UI cannot be touched before Service is ready) and automatically trim the tool whitelist to a maximum of 10 core tools to reduce context entropy.
 - [ ] **CI/CD for Agents**: Run the linter automatically at every boot cycle to ensure the agent's generated playbook doesn't violate architectural boundaries.
 
-### 🧬 Pillar 3: Memory Governance
-*We are transforming static logs into an evolutionary knowledge base.*
-- [ ] **Memory Evolution Engine (`memory_evolution.py`)**: When an execution scores high on the evaluation loop, the engine will extract the "success genes" (key insights, precise selectors, exact API parameters).
-- [ ] **Auto-Updating Playbooks**: These extracted genes will be saved to a lightweight Vector DB and automatically injected back into `playbook.md`, allowing the agent to continuously evolve its own best practices.
-
 ### 🌀 Bonus: Entropy Combat
 - [ ] **Git Auto-Commit & Rollback**: Integrate version control into the heartbeat. If the agent destroys the workspace, it can automatically roll back to the last known good state.
 - [ ] **Self-Healing PRs**: Instead of humans fixing the agent, the agent writes PRs to fix its own tools when it encounters persistent blockers.
+- [ ] **Coordinator WebSocket Mode**: Real-time IPC for latency-sensitive multi-agent tasks.
+- [ ] **Prompt Cache Analytics**: Track and report prompt cache hit rates.
 
 ---
 
@@ -197,3 +197,30 @@ OpenHarness is released under the [Business Source License 1.1](LICENSE). **Free
 | 1 | [@thu-nmrc](https://github.com/thu-nmrc)  | Creator |
 | 2 | [@shenlab-thu](https://github.com/shenlab-thu) | Contributor |
 
+---
+
+## 📋 Changelog
+
+### 2026.04.01
+
+This release introduces four production-grade enhancements inspired by architectural patterns observed in leading commercial AI coding agents.
+
+**Three-Layer Self-Healing Memory** — The original flat `heartbeat.md` + `progress.md` design suffered from linear growth that eventually overwhelmed the LLM context window. Memory is now split into three layers: a compact pointer index (Layer 1, `heartbeat.md`, always < 2KB), on-demand topic knowledge files (Layer 2, `knowledge/*.md`), and an append-only execution stream log (Layer 3, `logs/execution_stream.log`, grep-only access). A new `harness_memory.py` script manages all three layers with strict write discipline — Layer 1 pointers are only updated after external validation confirms success.
+
+**Circuit Breaker & Stuck Detection** — Previously, a failing task could enter an infinite retry loop, silently burning API credits. `harness_boot.py` now includes a circuit breaker that automatically blocks execution after N consecutive failures (default: 3). It also detects "stuck" sessions where the status remains `running` from a crashed previous run, auto-recovering them to `idle` with a failure increment. This directly addresses the runaway cost problem documented in production AI agent systems.
+
+**KAIROS Dream Mode** — A new `harness_dream.py` script performs offline memory consolidation during idle periods. When triggered (typically via a daily off-hours cron job), it scans the execution stream for recurring patterns, consolidates fragmented knowledge topic files, prunes stale Layer 1 pointers, and injects distilled best practices (frequent error warnings, proven recovery strategies) back into `playbook.md`. This replaces and supersedes the older `memory_evolution.py` approach.
+
+**Multi-Agent Coordinator** — A new `harness_coordinator.py` enables parallel subtask execution through a file-system-based IPC protocol. A Coordinator process dispatches tasks by writing XML-formatted Markdown files to worker `inbox/` directories; workers execute independently and write results to their `outbox/` directories. The coordinator can then collect, aggregate, and archive results. This is designed for tasks that are naturally parallelizable (e.g., processing multiple independent data sources).
+
+| Category | Files Changed |
+|----------|---------------|
+| **New scripts** | `harness_memory.py`, `harness_dream.py`, `harness_coordinator.py` |
+| **Refactored scripts** | `harness_boot.py`, `harness_heartbeat.py`, `harness_cleanup.py` |
+| **New templates** | `templates/knowledge/README.md` |
+| **Redesigned templates** | `templates/heartbeat.md` (now L1 pointer index format) |
+| **Updated docs** | `SKILL.md`, `README.md`, `references/architecture.md`, `references/anti-patterns.md` |
+
+### 2026.03.31
+
+Initial release. Six Pillars of Harness Engineering: machine-verifiable contracts, system of record, agent senses and effectors, cross-session memory, external validation loop, and entropy control.
