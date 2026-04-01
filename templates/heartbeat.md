@@ -1,13 +1,17 @@
-# Heartbeat | Heartbeat Status
+# Heartbeat | Cross-Session State Index (Layer 1)
 
-> This file is the Agent's "cross-session memory." It is read at the start of each execution and updated at the end.
-> This reflects the fourth load-bearing component of the driving engineering: solving long-term amnesia.
-> **This file is automatically maintained by the framework, and users generally do not need to edit it manually.**
+> **Three-Layer Memory Architecture — Layer 1: Pointer Index (Always in Context)**
+>
+> This file is the Agent's compact cross-session memory. It MUST stay small (target: < 2KB).
+> It contains ONLY status fields and pointers to knowledge files. NO verbose logs here.
+> Detailed knowledge lives in `knowledge/*.md` (Layer 2). Raw logs live in `logs/` (Layer 3, grep-only).
+>
+> **Strict Write Discipline**: Only update this file AFTER `harness_eval.py` confirms success.
 
 ## System Status
 
 | Field | Value |
-|------|-----|
+|-------|-------|
 | Task Name | `[Read from mission.md by the framework]` |
 | Current Status | `idle` |
 | Last Execution Time | `[Not executed]` |
@@ -16,49 +20,41 @@
 | Consecutive Failures | `0` |
 | Next Scheduled Execution | `[Determined by cron]` |
 
-## Current Progress
+## Execution Pointer
 
 | Field | Value |
-|------|-----|
+|-------|-------|
 | Current Step | `Step 0 (Not started)` |
 | Completed Steps | `None` |
 | Pending Steps | `All` |
 | Blocking Reason | `None` |
+| Last Successful Artifact | `None` |
 
-## This Round Execution Summary
+## Knowledge Index
 
-<!-- Automatically written by the framework at the end of each execution -->
+<!-- Each row is a pointer to a Layer 2 topic file. Max 150 chars per row. -->
+<!-- Format: Topic Tag -> relative path to knowledge file -->
+<!-- Agent reads a topic file ONLY when the current task requires that knowledge. -->
 
-```
-[Execution summary will appear after the first run]
-```
+| Topic | Path | Last Updated |
+|-------|------|--------------|
+| _example_ | `knowledge/example_topic.md` | `[Not created]` |
 
-## Exception Records
+## Active Alerts
 
-<!-- Records exceptions encountered during execution for reference in the next run -->
+<!-- Circuit breaker and anomaly flags. Checked by harness_boot.py on every startup. -->
 
-| Time | Step | Exception Description | Handling Method |
-|------|------|----------|----------|
-| - | - | No exceptions so far | - |
-
-## To-Do Items (Cross-Session)
-
-<!-- Items not completed by the Agent in this round, to be continued next round -->
-
-- [ ] `[No to-dos]`
-
-## Key Findings and Experience
-
-<!-- Important information discovered by the Agent during execution to avoid repeating mistakes next time -->
-
-- `[None]`
+| Alert | Status | Since |
+|-------|--------|-------|
+| Circuit Breaker | `off` | `-` |
+| Compaction Failures | `0` | `-` |
+| Stuck Detection | `clear` | `-` |
 
 ---
 
-> **Status Value Explanation**:
-> - `idle`: Idle, waiting for the next trigger
-> - `running`: Executing
-> - `completed`: This round of execution completed
-> - `failed`: This round of execution failed
-> - `blocked`: Blocked, requires manual intervention
-> - `mission_complete`: The entire task has been completed
+> **Status Values**: `idle` | `running` | `completed` | `failed` | `blocked` | `mission_complete`
+>
+> **Memory Layers**:
+> - **Layer 1** (this file): Pointer index, always loaded. Keep under 2KB.
+> - **Layer 2** (`knowledge/*.md`): Topic files, loaded on demand via tool calls.
+> - **Layer 3** (`logs/execution_stream.log`): Append-only raw log. NEVER read fully — grep only.
